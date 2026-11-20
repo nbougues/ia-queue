@@ -1,0 +1,9 @@
+# runtime data and real configuration stay out of the repo
+config.json
+state/
+logs/
+livrables/
+docs/
+__pycache__/
+*.bak-*
+.DS_Store

@@ -1,0 +1,40 @@
+[Unit]
+Description=ia-free : etat de liberte du serveur IA + bail GPU global
+Documentation=file:/usr/local/bin/ia-free-server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+DynamicUser=yes
+StateDirectory=ia-free
+ExecStart=/usr/bin/python3 /usr/local/bin/ia-free-server
+Restart=always
+RestartSec=5
+Environment=IA_FREE_PORT=8765
+Environment=IA_FREE_BIND=0.0.0.0
+Environment=IA_FREE_STATE_FILE=/var/lib/ia-free/state.json
+# 3 requetes en cours au plus. La valeur historique (1) faisait attendre l'arbitre
+# 4x plus que le moteur lui-meme : celui-ci a 4 slots et sert jusqu'a 8 flux en
+# rounds conjoints. Ce n'est plus qu'un garde-fou de file d'attente, plus la
+# contrainte de capacite (voir IA_FREE_KV_RESERVE_POSITIONS).
+Environment=IA_FREE_MAX_INFLIGHT=3
+# budget KV : n'admet une session de plus que s'il reste la place d'UN contexte
+# complet dans le pool KV. Sans ca, admettre = evincer un contexte chaud = payer un
+# re-prefill integral (mesure : ~88 s pour 148k tokens, contre ~0,4 s servi).
+Environment=IA_FREE_KV_GATE=1
+Environment=IA_FREE_KV_RESERVE_POSITIONS=157000
+# aucun cooldown : le bail global suffit a serialiser les taches de fond
+Environment=IA_FREE_COOLDOWN_S=0
+# -1 : le % GPU n'est pas un critere de refus (signal seulement)
+Environment=IA_FREE_GPU_MAX=-1
+Environment=IA_FREE_LEASE_TTL=2700
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadOnlyPaths=/sys/class/drm
+MemoryMax=96M
+CPUQuota=10%
+
+[Install]
+WantedBy=multi-user.target

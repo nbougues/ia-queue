@@ -1,0 +1,40 @@
+{
+  "_doc": "Shared configuration for the non-urgent AI slots. No secrets here. Copy to config.json and edit.",
+  "server": "http://inference-host:8765",
+  "jitter_max_s": 540,
+  "lease_ttl_s": 2700,
+  "renew_every_s": 300,
+  "max_task_minutes": 40,
+  "queue_path": "Hermes/AI Queue",
+  "runlog_path": "Hermes/Run Log",
+  "wf": "python3 ~/workflowy/wf.py",
+  "workdir": "~/ia-queue",
+  "window": {
+    "_doc": "start_hour/end_hour in local time; days = 'any' or '1,2,3,4,5' (Monday=1)",
+    "start_hour": 0,
+    "end_hour": 24,
+    "days": "any"
+  },
+  "_agents_doc": "binary = the Hermes binary of the profile. wf_home = WF_HOME of the queue client (its own identity, hence its own write roots); null = shared client config. check_free=false if this agent's model does not run on the local GPU. enabled=false = the tick launches nothing, even if the cron job exists.",
+  "agents": {
+    "default": {
+      "binary": "hermes",
+      "label": "Default profile",
+      "enabled": true,
+      "queue_path": "Hermes/AI Queue",
+      "runlog_path": "Hermes/Run Log",
+      "wf_home": null,
+      "check_free": true
+    },
+    "finance": {
+      "binary": "finance",
+      "label": "Another profile",
+      "enabled": true,
+      "queue_path": "Hermes-Finance/AI Queue",
+      "runlog_path": "Hermes-Finance/Run Log",
+      "wf_home": "~/workflowy-finance",
+      "check_free": true
+    }
+  },
+  "task_prompt_template": ""
+}
